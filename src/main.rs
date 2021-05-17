@@ -1,3 +1,14 @@
+use http::request::Request;
+use http::method::Method;
+use server::Server;
+
+mod server;
+mod http;
+
 fn main() {
-    println!("Hello, world!");
+
+    // string holds IP address and Port number
+    // here, new is an associated function
+    let server = Server::new("127.0.0.1:8080".to_string());
+    server.run();
 }
