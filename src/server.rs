@@ -1,28 +1,15 @@
-// struct holds data
+use std::net::TcpListener;
+use std::io::Read;
+
 pub struct Server {
-    // data we want struct to hold
-    // single string that hold IP and Port
 
     addr: String,
 }
 
 // implementation holds struct functionality
 impl Server {
-    // either a method or associated function
-
-    // methods in rust always take a special first parameter called self
-    // self represents the instance of the struct the method is being called on
-
-    // the other type is associated functions
-    // fn's that are associated with the struct type, but they dont need an instance of the struct
-    // similar to static methods in other languages
-    // double colon to access associated functions
-
-    // we can name this anything, we are choosing 'new'
-    // accepts String, Returns Server
-    // uppercase Self is an alias for the name of the struct
+    
     pub fn new(addr: String) -> Self {
-
         // could also be named 'Server'
         Self {
             addr: addr
@@ -35,6 +22,26 @@ impl Server {
     // if we don't want to deallocate after, we can take a reference of '&self'
     pub fn run(self) {
         println!("Listening on {}", self.addr); 
+
+        // creating new listening using bind function
+        let listener = TcpListener::bind(&self.addr).unwrap();
+
+        loop {
+
+            match listener.accept() {
+                Ok((mut stream, _)) => {
+                    let mut buffer = [0; 1024];
+
+                    match stream.read(&mut buffer) {
+                        Ok(_) => {
+                            println!("Recieved a request: {}", String::from_utf8_lossy(&buffer))
+                        },
+                        Err(e) =>  println!("Failed to read from connection: {}", e),
+                    }
+                },
+                Err(e) => println!("Failed to establish a connection: {}", e),
+            }
+        }
     }
 
 }
